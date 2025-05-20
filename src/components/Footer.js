@@ -5,8 +5,7 @@ import { Container } from '../styles/styles';
 function Footer() {
   const { theme } = useTheme();
   
-  return (
-    <footer style={{
+  return (    <footer style={{
       backgroundColor: theme === 'light' ? '#f2f2f2' : '#333',
       padding: '20px 0',
       marginTop: '40px',
@@ -15,9 +14,7 @@ function Footer() {
     }}>
       <Container>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-          <p style={{ color: theme === 'light' ? '#444' : '#ccc', marginBottom: '16px' }}>
-            © 2025 寵物百貨. 版權所有.
-          </p>
+          {/* 底部可以放置導航連結或社交媒體圖標 */}
         </div>
       </Container>
     </footer>

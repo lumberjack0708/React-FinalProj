@@ -7,11 +7,12 @@ import CartPage from './pages/CartPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Footer from './components/Footer';
 import { ThemeProvider, useTheme } from './hooks/useTheme';
+import { NotificationProvider } from './components/Notification';
 import { Nav, ThemeWrapper, Button } from './styles/styles';
 import 'normalize.css'; // 引入 normalize.css
 
 function AppContent() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   
   // 從 Redux store 獲取購物車數量
@@ -111,7 +112,9 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <NotificationProvider>
+        <AppContent />
+      </NotificationProvider>
     </ThemeProvider>
   );
 }
