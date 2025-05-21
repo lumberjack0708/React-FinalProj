@@ -1,6 +1,5 @@
 import './App.css';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import CartPage from './pages/CartPage';
@@ -9,14 +8,15 @@ import Footer from './components/Footer';
 import { ThemeProvider, useTheme } from './hooks/useTheme';
 import { NotificationProvider } from './components/Notification';
 import { Nav, ThemeWrapper, Button } from './styles/styles';
+import { CartProvider, useCart } from './contexts/CartContext';
 import 'normalize.css'; // 引入 normalize.css
 
 function AppContent() {
   const { theme } = useTheme();
   const navigate = useNavigate();
   
-  // 從 Redux store 獲取購物車數量
-  const cartItems = useSelector(state => state.cart.items);
+  // 使用 Context API 代替 Redux
+  const { items: cartItems } = useCart();
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   
   return (
@@ -37,15 +37,9 @@ function AppContent() {
             justifyContent: 'center',
             flex: 1
           }}>
-            <li>
-              <Link to="/">首頁</Link>
-            </li>
-            <li>
-              <Link to="/products">瀏覽全部商品</Link>
-            </li>
-            <li>
-              <Link to="/cart">購物車</Link>
-            </li>
+            <li><Link to="/">首頁</Link></li>
+            <li><Link to="/products">瀏覽全部商品</Link></li>
+            <li><Link to="/cart">購物車</Link></li>
           </ul>
           
           <div 
@@ -95,9 +89,7 @@ function AppContent() {
             )}
           </div>
         </div>
-      </Nav>
-
-      <Routes>
+      </Nav>      <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
@@ -113,7 +105,9 @@ function App() {
   return (
     <ThemeProvider>
       <NotificationProvider>
-        <AppContent />
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
       </NotificationProvider>
     </ThemeProvider>
   );

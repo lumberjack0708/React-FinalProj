@@ -1,63 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import { useTheme } from '../hooks/useTheme';
-import { updateQuantity, removeFromCart, clearCart } from '../redux/cartSlice';
+import { useCart } from '../contexts/CartContext';
+import { useNotification } from '../components/Notification';
 import { Container, Card, Heading, Button } from '../styles/styles';
-
-// 模擬 API 請求 - 此函數在 Redux 版本中不再使用，但保留用於教學目的
-const fetchCartItems = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { id: 1, name: '貓咪飼料', price: 1200, quantity: 2 },
-        { id: 2, name: '寵物玩具球', price: 350, quantity: 1 },
-        { id: 3, name: '貓砂', price: 500, quantity: 3 }
-      ]);
-    }, 1000);
-  });
-};
 
 function CartPage() {
   // 使用主題
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   
-  // 從 Redux store 獲取購物車數據
-  const cartItems = useSelector(state => state.cart.items);
+  // 使用自訂的 Hooks
+  const { items: cartItems, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
+  const { notify } = useNotification();
   
   // 載入狀態 - 在真實應用中，若是從API獲取數據會用到
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-    // 使用 useEffect 模擬 API 請求 - 使用 Redux 後不再需要
-  /*
-  useEffect(() => {
-    setLoading(true);
-    fetchCartItems()
-      .then(data => {
-        setCartItems(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError('無法載入購物車資訊');
-        setLoading(false);
-        console.error(err);
-      });
-  }, []);
-  */
   
-  // 計算購物車總金額
-  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // 更新商品數量
+  // 更新商品數量
   const handleUpdateQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
-    dispatch(updateQuantity({ id, quantity: newQuantity }));
+    updateQuantity(id, newQuantity);
   };
   
   // 移除商品
   const handleRemoveItem = (id) => {
-    dispatch(removeFromCart(id));
+    removeFromCart(id);
+  };
+    // 處理結帳
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      notify.warning('購物車是空的', '請先添加商品到購物車');
+      return;
+    }
+    // 顯示訂單明細
+    const orderInfo = cartItems.map(item => `${item.name} x ${item.quantity} = $${item.price * item.quantity}`).join('\n');
+    const message = `訂單已成立！\n\n商品明細：\n${orderInfo}\n\n總金額：$${totalPrice}\n\n感謝您的購買！`;
+    alert(message);
+    clearCart();
   };
   
   return (
@@ -105,19 +86,13 @@ function CartPage() {
                 </Button>
               </div>
             </Card>
-          ))}
-            <Card theme={theme}>
+          ))}            <Card theme={theme}>
             <h3>訂單摘要</h3>
-            <p>總金額: ${totalPrice}</p>            <Button 
+            <p>總金額: ${totalPrice}</p>
+            <Button 
               theme={theme} 
               primary
-              onClick={() => {
-                const orderInfo = cartItems.map(item => `${item.name} x ${item.quantity} = $${item.price * item.quantity}`).join('\n');
-                const message = `訂單已成立！\n\n商品明細：\n${orderInfo}\n\n總金額：$${totalPrice}\n\n感謝您的購買！`;
-                alert(message);
-                // 在實際應用中，此處會發送訂單到後端API
-                dispatch(clearCart());
-              }}
+              onClick={handleCheckout}
             >
               結帳
             </Button>

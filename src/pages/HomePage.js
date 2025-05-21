@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { useTheme } from '../hooks/useTheme';
-import { addToCart } from '../redux/cartSlice';
+import { useCart } from '../contexts/CartContext';
 import { getProductImage } from '../assets/images/index';
 import { useNotification } from '../components/Notification';
 import { Container, Card, Heading, Button } from '../styles/styles';
@@ -20,11 +19,10 @@ const fetchFeaturedProducts = () => {
   });
 };
 
-function HomePage() {
-  // 使用主題
+function HomePage() {  // 使用主題
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { addToCart } = useCart();
   const { notify } = useNotification();
   
   // 推薦產品狀態
@@ -107,9 +105,8 @@ function HomePage() {
                     查看商品
                   </Button>
                   <Button 
-                    theme={theme}
-                    onClick={() => {
-                      dispatch(addToCart(product));
+                    theme={theme}                    onClick={() => {
+                      addToCart(product);
                       notify.success(
                         '已加入購物車', 
                         `${product.name} 已成功加入您的購物車！`

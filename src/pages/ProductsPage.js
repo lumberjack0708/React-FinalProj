@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
-import { addToCart } from '../redux/cartSlice';
+import { useCart } from '../contexts/CartContext';
 import { getProductImage } from '../assets/images/index';
 import { useNotification } from '../components/Notification';
 import ProductDetailModal from '../components/ProductDetailModal';
@@ -16,9 +15,11 @@ import {
 function ProductsPage() {
   // 使用主題
   const { theme } = useTheme();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { notify } = useNotification();
+  
+  // 使用自訂的 useCart Hook 替代 Redux
+  const { addToCart } = useCart();
   
   // 模擬產品數據
   const [products, setProducts] = useState([
@@ -120,9 +121,8 @@ function ProductsPage() {
                 查看詳情
               </Button>              <Button 
                 theme={theme}
-                style={{ flex: 1, padding: '10px 0' }}
-                onClick={() => {
-                  dispatch(addToCart(product));
+                style={{ flex: 1, padding: '10px 0' }}                onClick={() => {
+                  addToCart(product);
                   // 使用通知組件代替 alert
                   notify.success(
                     '已加入購物車', 
@@ -136,13 +136,12 @@ function ProductsPage() {
           </Card>
         ))}      </div>
       
-      {/* 產品詳情模態框 */}
-      {selectedProduct && (
+      {/* 產品詳情模態框 */}      {selectedProduct && (
         <ProductDetailModal 
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onAddToCart={(product) => {
-            dispatch(addToCart(product));
+            addToCart(product);
             notify.success(
               '已加入購物車', 
               `${product.name} 已成功加入您的購物車！`
