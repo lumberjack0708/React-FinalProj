@@ -185,6 +185,13 @@ const Notification = ({ id, title, description, type, onClose }) => {
   );
 };
 
+/**
+ * @function NotificationProvider
+ * @description 提供全域通知功能的 Context Provider。
+ * @param {object} props - 傳入的子元件。
+ * @returns {JSX.Element} 返回包裹子元件的 Provider。
+ */
+
 // 全局通知上下文
 export const NotificationContext = React.createContext();
 
@@ -228,6 +235,12 @@ export const NotificationProvider = ({ children }) => {
     </NotificationContext.Provider>
   );
 };
+
+/**
+ * @function useNotification
+ * @description 自定義 Hook，簡化通知的使用。
+ * @returns {object} 提供通知操作方法。
+ */
 
 // 自定義 Hook，用於在其他組件中使用通知系統
 export const useNotification = () => {

@@ -1,27 +1,35 @@
+// 匯入必要的 CSS 檔案和 React Router DOM 元件
 import './App.css';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+// 匯入頁面級元件
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import CartPage from './pages/CartPage';
 import NotFoundPage from './pages/NotFoundPage';
+// 匯入共用元件
 import Footer from './components/Footer';
-import { ThemeProvider, useTheme } from './hooks/useTheme';
+// 匯入通知相關的 Provider
 import { NotificationProvider } from './components/Notification';
-import { Nav, ThemeWrapper, Button } from './styles/styles';
-import { CartProvider, useCart } from './contexts/CartContext';
-import 'normalize.css'; // 引入 normalize.css
+// 匯入樣式化元件
+import { Nav } from './styles/styles';
+// 匯入 Redux 相關函數和選擇器
+import { useSelector } from 'react-redux';
+import { selectCartItemCount } from './store/cartSlice';
+// 匯入 normalize.css 標準化瀏覽器樣式
+import 'normalize.css'; 
 
+/**
+ * @function AppContent
+ * @description 應用程式的主要內容元件，包含導覽列、路由設定和頁尾。
+ * @returns {JSX.Element} 返回應用程式內容的 JSX 結構。
+ */
 function AppContent() {
-  const { theme } = useTheme();
   const navigate = useNavigate();
-  
-  // 使用 Context API 代替 Redux
-  const { items: cartItems } = useCart();
-  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const cartItemCount = useSelector(selectCartItemCount);   // 使用 Redux 選擇器獲取購物車商品數量
   
   return (
-    <ThemeWrapper>
-      <Nav theme={theme}>
+    <>
+      <Nav>
         <div style={{ 
           display: 'flex', 
           justifyContent: 'space-between', 
@@ -30,8 +38,7 @@ function AppContent() {
           margin: '0 auto',
           padding: '0 20px'
         }}>
-          <div style={{ width: '100px' }}></div> {/* 左側空白區，用於平衡布局 */}
-          
+          <div style={{ width: '100px' }}></div> 
           <ul style={{ 
             display: 'flex', 
             justifyContent: 'center',
@@ -41,7 +48,6 @@ function AppContent() {
             <li><Link to="/products">瀏覽全部商品</Link></li>
             <li><Link to="/cart">購物車</Link></li>
           </ul>
-          
           <div 
             onClick={() => navigate('/cart')}
             style={{
@@ -58,7 +64,7 @@ function AppContent() {
               height="28" 
               viewBox="0 0 24 24" 
               fill="none" 
-              stroke="white" 
+              stroke="white"
               strokeWidth="2" 
               strokeLinecap="round" 
               strokeLinejoin="round"
@@ -72,7 +78,7 @@ function AppContent() {
                 position: 'absolute',
                 top: '-8px',
                 right: '30px',
-                background: theme === 'light' ? '#ff5e7b' : '#ff7b97',
+                background: '#ff5e7b',
                 color: 'white',
                 borderRadius: '50%',
                 width: '20px',
@@ -89,27 +95,29 @@ function AppContent() {
             )}
           </div>
         </div>
-      </Nav>      <Routes>
+      </Nav>
+      <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      
       <Footer />
-    </ThemeWrapper>
+    </>
   );
 }
 
+/**
+ * @function App
+ * @description 應用程式的根元件。
+ * @returns {JSX.Element} 返回包裹了 NotificationProvider 的 AppContent 元件。
+ */
 function App() {
   return (
-    <ThemeProvider>
-      <NotificationProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </NotificationProvider>
-    </ThemeProvider>
+    // 全域通知
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
   );
 }
 

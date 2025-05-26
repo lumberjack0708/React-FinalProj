@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../hooks/useTheme';
-import { useCart } from '../contexts/CartContext';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../store/cartSlice';
 import { getProductImage } from '../assets/images/index';
 import { useNotification } from '../components/Notification';
 import ProductDetailModal from '../components/ProductDetailModal';
@@ -12,14 +12,17 @@ import {
   Button
 } from '../styles/styles';
 
+/**
+ * @function ProductsPage
+ * @description 商品列表頁面，顯示所有商品並可加入購物車。
+ * @returns {JSX.Element} 返回商品頁面的 JSX 結構。
+ */
+
 function ProductsPage() {
-  // 使用主題
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const { notify } = useNotification();
   
-  // 使用自訂的 useCart Hook 替代 Redux
-  const { addToCart } = useCart();
+  const dispatch = useDispatch(); // 使用 Redux dispatch
   
   // 模擬產品數據
   const [products, setProducts] = useState([
@@ -37,22 +40,39 @@ function ProductsPage() {
   // 產品詳情模態框狀態
   const [selectedProduct, setSelectedProduct] = useState(null);
   
+  // 添加商品到購物車的處理函數
+  const handleAddToCart = (product) => {
+    dispatch(addToCart(product));
+    notify.success(
+      '已加入購物車', 
+      `${product.name} 已成功加入您的購物車！`
+    );
+  };
+  
   // 篩選產品
-  const filteredProducts = categoryFilter === 'all' 
-    ? products 
-    : products.filter(product => product.category === categoryFilter);
+  let filteredProducts;
+  if (categoryFilter === 'all') {
+    filteredProducts = products;  // 如果選擇「所有類別」，顯示全部產品
+  } else {
+    // 如果選擇了特定類別，只顯示該類別的產品
+    filteredProducts = products.filter(function(product) {
+      return product.category === categoryFilter;   // 檢查每個產品類別是否與所選類別相符
+    });
+  }
+
   return (
     <Container>
-      <Heading theme={theme}>瀏覽全部商品</Heading>
+      <Heading>瀏覽全部商品</Heading>
       
-      {/* 篩選器 */}
-      <Card theme={theme}>
+      {/* 篩選器UI */}
+      <Card>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label>按類別篩選：</label>
           <select 
             value={categoryFilter} 
             onChange={(e) => setCategoryFilter(e.target.value)}
-            style={{              padding: '8px 12px',
+            style={{
+              padding: '8px 12px',
               border: '1px solid #660000',
               borderRadius: '4px',
               marginRight: '10px'
@@ -70,9 +90,9 @@ function ProductsPage() {
       
       {/* 產品列表 */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', margin: '20px 0' }}>
-        {filteredProducts.map(product => (          <Card 
+        {filteredProducts.map(product => (
+          <Card 
             key={product.id} 
-            theme={theme} 
             style={{ 
               flex: '1 1 calc(33.333% - 20px)', 
               minWidth: '250px',
@@ -81,9 +101,11 @@ function ProductsPage() {
               height: '450px',  // 固定高度
               justifyContent: 'space-between'  // 確保內容平均分布
             }}
-          >            <img 
+          >
+            <img 
               src={getProductImage(product.category, product.name) || '/placeholder.png'} 
-              alt={product.name}              style={{ 
+              alt={product.name}
+              style={{ 
                 width: '100%', 
                 height: '220px', 
                 objectFit: 'contain', 
@@ -92,14 +114,15 @@ function ProductsPage() {
                 backgroundColor: '#f9f9f9'
               }}
             />
-            <h3 style={{ marginBottom: '8px' }}>{product.name}</h3>            <p style={{ 
+            <h3 style={{ marginBottom: '8px' }}>{product.name}</h3>
+            <p style={{ 
               fontSize: '18px', 
               fontWeight: 'bold', 
               color: '#660000',
               marginBottom: '15px' 
             }}>${product.price}</p>
             
-            {/* 按鈕區域 - 改為水平排列 */}
+            {/* 按鈕 */}
             <div style={{ 
               display: 'flex', 
               flexDirection: 'row', 
@@ -107,7 +130,6 @@ function ProductsPage() {
               marginTop: 'auto' 
             }}>              
               <Button 
-                theme={theme} 
                 primary
                 style={{ flex: 1, padding: '10px 0' }}
                 onClick={() => {
@@ -119,34 +141,24 @@ function ProductsPage() {
                 }}
               >
                 查看詳情
-              </Button>              <Button 
-                theme={theme}
-                style={{ flex: 1, padding: '10px 0' }}                onClick={() => {
-                  addToCart(product);
-                  // 使用通知組件代替 alert
-                  notify.success(
-                    '已加入購物車', 
-                    `${product.name} 已成功加入您的購物車！`
-                  );
-                }}
+              </Button>
+              <Button 
+                style={{ flex: 1, padding: '10px 0' }}
+                onClick={() => handleAddToCart(product)}
               >
                 加入購物車
               </Button>
             </div>
           </Card>
-        ))}      </div>
+        ))}
+      </div>
       
-      {/* 產品詳情模態框 */}      {selectedProduct && (
+      {/* 產品詳情模態框 */}
+      {selectedProduct && (
         <ProductDetailModal 
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onAddToCart={(product) => {
-            addToCart(product);
-            notify.success(
-              '已加入購物車', 
-              `${product.name} 已成功加入您的購物車！`
-            );
-          }}
+          onAddToCart={handleAddToCart}
         />
       )}
     </Container>

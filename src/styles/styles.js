@@ -3,29 +3,27 @@
 import React from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useTheme } from '../hooks/useTheme';
 
-// 定義顏色主題
+/**
+ * @description 專案主要樣式與 styled-components 設定。
+ *              包含主題、按鈕、卡片、容器等樣式元件。
+ */
+
+// 只保留亮色主題
 const colors = {
   light: {
     background: '#f7f7f7',
     text: '#333333',
     primary: '#2B2118',
     secondary: '#A24C00',
-  },
-  dark: {
-    background: '#222222',
-    text: '#f7f7f7',
-    primary: '#7b8cff',
-    secondary: '#ff7b97',
   }
 };
 
 // 共用樣式
-export const globalStyles = (theme) => css`
+export const globalStyles = css`
   body {
-    background-color: ${colors[theme].background};
-    color: ${colors[theme].text};
+    background-color: #f7f7f7;
+    color: #333333;
     transition: all 0.3s ease;
     font-family: 'Noto Sans TC', sans-serif;
   }
@@ -33,7 +31,7 @@ export const globalStyles = (theme) => css`
 
 // 按鈕樣式
 export const Button = styled.button`
-  background-color: ${props => props.primary ? colors[props.theme].primary : colors[props.theme].secondary};
+  background-color: #2B2118;
   color: white;
   padding: 8px 16px;
   border: none;
@@ -56,7 +54,7 @@ export const Container = styled.div`
 
 // 卡片樣式
 export const Card = styled.div`
-  background-color: ${props => colors[props.theme].background === '#f7f7f7' ? 'white' : '#333'};
+  background-color: white;
   border-radius: 8px;
   padding: 16px;
   margin: 16px 0;
@@ -70,13 +68,13 @@ export const Card = styled.div`
 
 // 標題樣式
 export const Heading = styled.h1`
-  color: ${props => colors[props.theme].primary};
+  color: #2B2118;
   margin-bottom: 16px;
 `;
 
 // 導航樣式
 export const Nav = styled.nav`
-  background-color: ${props => colors[props.theme].primary};
+  background-color: #2B2118;
   color: white;
   padding: 16px;
   
@@ -103,23 +101,6 @@ export const Nav = styled.nav`
   }
 `;
 
-// 主題包裝組件 - 將主題傳遞給有樣式的組件
-export function ThemeWrapper({ children }) {
-  const { theme } = useTheme();
-  
-  return (
-    <div css={globalStyles(theme)}>
-      {React.Children.map(children, child => {
-        // 如果子元素是 React 元素，則為其添加主題屬性
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child, { theme });
-        }
-        return child;
-      })}
-    </div>
-  );
-}
-
 // 表單輸入框樣式
 export const Input = styled.input`
   padding: 8px 12px;
@@ -138,7 +119,7 @@ export const Input = styled.input`
 export const Label = styled.label`
   display: block;
   margin-bottom: 8px;
-  color: ${props => colors[props.theme].text};
+  color: #333333;
 `;
 
 // 表單組樣式
@@ -148,7 +129,7 @@ export const FormGroup = styled.div`
 
 // 表單錯誤訊息樣式
 export const ErrorMessage = styled.p`
-  color: ${props => colors[props.theme].secondary};
+  color: #A24C00;
   font-size: 14px;
   margin-top: 4px;
 `;

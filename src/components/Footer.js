@@ -1,16 +1,19 @@
 import React from 'react';
-import { useTheme } from '../hooks/useTheme';
 import { Container } from '../styles/styles';
 
+/**
+ * @function Footer
+ * @description 網站頁尾元件，顯示版權資訊。
+ * @returns {JSX.Element} 返回頁尾的 JSX 結構。
+ */
 function Footer() {
-  const { theme } = useTheme();
-  
-  return (    <footer style={{
-      backgroundColor: theme === 'light' ? '#f2f2f2' : '#333',
+  return (
+    <footer style={{
+      backgroundColor: '#f2f2f2',
       padding: '20px 0',
       marginTop: '40px',
       textAlign: 'center',
-      borderTop: `1px solid ${theme === 'light' ? '#e0e0e0' : '#444'}`
+      borderTop: '1px solid #e0e0e0'
     }}>
       <Container>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>

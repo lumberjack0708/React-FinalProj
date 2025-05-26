@@ -1,3 +1,8 @@
+/**
+ * @description 匯出專案用到的圖片取得工具。
+ *              根據類別與名稱取得對應圖片路徑。
+ */
+
 // 食品類圖片
 import catFood from './food/cat-food.jpg';
 import dogBoneClean from './food/dog-bone-clean.jpg';

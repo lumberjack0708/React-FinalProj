@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from '@emotion/styled';
-import { useTheme } from '../hooks/useTheme';
 import { Button } from '../styles/styles';
 
 // 模態對話框背景
@@ -150,10 +149,15 @@ const ModalFooter = styled.div`
   gap: 12px;
 `;
 
+/**
+ * @function ProductDetailModal
+ * @description 商品詳情彈窗元件，顯示商品資訊與加入購物車按鈕。
+ * @param {object} props - 包含商品資料、開關狀態、關閉函數等。
+ * @returns {JSX.Element|null} 返回彈窗內容或 null。
+ */
+
 // 產品詳情模態對話框組件
 function ProductDetailModal({ product, onClose, onAddToCart }) {
-  const { theme } = useTheme();
-  
   // 產品類別中文名稱映射
   const categoryNames = {
     food: '食品',
@@ -246,13 +250,11 @@ function ProductDetailModal({ product, onClose, onAddToCart }) {
         
         <ModalFooter>
           <Button 
-            theme={theme} 
             onClick={onClose}
           >
             關閉
           </Button>
           <Button 
-            theme={theme}
             primary
             onClick={() => {
               onAddToCart(product);
