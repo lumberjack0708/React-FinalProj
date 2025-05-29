@@ -4,7 +4,11 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../store/cartSlice';
 import { getProductImage } from '../assets/images/index';
 import { useNotification } from '../components/Notification';
-import { Container, Card, Heading, Button } from '../styles/styles';
+import { Container, Heading, ProductImage } from '../styles/styles';
+import { Card, Button, Typography, Row, Col, Spin, Space, Statistic } from 'antd';
+import { ShoppingCartOutlined, EyeOutlined, InfoCircleOutlined } from '@ant-design/icons';
+
+const { Title, Paragraph, Text } = Typography;
 
 // 模擬取得首頁產品推薦的函數
 const fetchFeaturedProducts = () => {
@@ -60,74 +64,71 @@ function HomePage() {
       <Heading>寵物百貨歡迎您</Heading>
       
       <Card>        
-        <h2>為您的毛小孩找到最好的</h2>
-        <p>我們的寵物百貨提供各種優質的寵物產品，包括食品、玩具、配件和保健用品。</p>
-        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-          <Button primary onClick={() => navigate('/products')}>瀏覽全部商品</Button>
-          <Button>了解更多</Button>
-        </div>
+        <Title level={2}>為您的毛小孩找到最好的</Title>
+        <Paragraph>我們的寵物百貨提供各種優質的寵物產品，包括食品、玩具、配件和保健用品。</Paragraph>
+        <Space style={{ marginTop: '20px' }}>
+          <Button 
+            type="primary" 
+            icon={<ShoppingCartOutlined />}
+            onClick={() => navigate('/products')}
+          >
+            瀏覽全部商品
+          </Button>
+          <Button icon={<InfoCircleOutlined />}>了解更多</Button>
+        </Space>
       </Card>
       
       {/* 推薦產品區塊 */}
       <div style={{ marginTop: '30px' }}>
-        <h2>推薦產品</h2>
+        <Title level={2}>推薦產品</Title>
         
         {loading ? (
-          <p>載入中...</p>
-        ) : (
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            {featuredProducts.map(product => (
-              <Card key={product.id} style={{ 
-                flex: '1 1 calc(33.333% - 20px)', 
-                minWidth: '250px',
-                display: 'flex',
-                flexDirection: 'column',
-                height: '450px',
-                justifyContent: 'space-between'
-              }}>
-                <img 
-                  src={getProductImage(product.category, product.name) || '/placeholder.png'} 
-                  alt={product.name}
-                  style={{ 
-                    width: '100%', 
-                    height: '220px', 
-                    objectFit: 'contain', 
-                    borderRadius: '4px',
-                    marginBottom: '12px',
-                    backgroundColor: '#f9f9f9'
-                  }}
-                />
-                <h3 style={{ marginBottom: '8px' }}>{product.name}</h3>                
-                <p style={{ 
-                  fontSize: '18px', 
-                  fontWeight: 'bold', 
-                  color: '#660000',
-                  marginBottom: '15px' 
-                }}>${product.price}</p>
-                
-                {/* 按鈕 */}
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'row', 
-                  gap: '10px',
-                  marginTop: 'auto' 
-                }}>
-                  <Button 
-                    primary 
-                    onClick={() => navigate(`/products`)}
-                    style={{ flex: 1, padding: '10px 0' }}
-                  >
-                    查看商品
-                  </Button>
-                  <Button 
-                    onClick={() => handleAddToCart(product)}
-                    style={{ flex: 1, padding: '10px 0' }}
-                  >
-                    直接購買
-                  </Button>
-                </div></Card>
-            ))}
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <Spin size="large" />
           </div>
+        ) : (
+          <Row gutter={[16, 16]}>
+            {featuredProducts.map(product => (
+              <Col xs={24} sm={12} md={8} key={product.id}>
+                <Card
+                  hoverable
+                  cover={
+                    <ProductImage 
+                      src={getProductImage(product.category, product.name) || '/placeholder.png'} 
+                      alt={product.name}
+                    />
+                  }
+                  actions={[
+                    <Button 
+                      type="text" 
+                      icon={<EyeOutlined />}
+                      onClick={() => navigate(`/products`)}
+                    >
+                      查看商品
+                    </Button>,
+                    <Button 
+                      type="text" 
+                      icon={<ShoppingCartOutlined />}
+                      onClick={() => handleAddToCart(product)}
+                    >
+                      直接購買
+                    </Button>
+                  ]}
+                >
+                  <Card.Meta
+                    title={<Title level={4}>{product.name}</Title>}
+                    description={
+                      <Statistic 
+                        value={product.price} 
+                        prefix="$"
+                        valueStyle={{ color: '#2B2118', fontSize: '18px' }}
+                      />
+                    }
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
         )}
       </div>
     </Container>

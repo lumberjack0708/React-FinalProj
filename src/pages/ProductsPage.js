@@ -5,12 +5,32 @@ import { addToCart } from '../store/cartSlice';
 import { getProductImage } from '../assets/images/index';
 import { useNotification } from '../components/Notification';
 import ProductDetailModal from '../components/ProductDetailModal';
+// 引入 Ant Design 元件
+import { 
+  Row, 
+  Col, 
+  Card, 
+  Typography, 
+  Button, 
+  Select, 
+  Space, 
+  Statistic, 
+  Badge,
+  Divider
+} from 'antd';
+import { 
+  ShoppingCartOutlined, 
+  EyeOutlined 
+} from '@ant-design/icons';
+// 引入保留的 Emotion 樣式組件
 import {
   Container,
-  Card,
   Heading,
-  Button
+  ProductImage
 } from '../styles/styles';
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 /**
  * @function ProductsPage
@@ -50,108 +70,107 @@ function ProductsPage() {
   };
   
   // 篩選產品
-  let filteredProducts;
-  if (categoryFilter === 'all') {
-    filteredProducts = products;  // 如果選擇「所有類別」，顯示全部產品
-  } else {
-    // 如果選擇了特定類別，只顯示該類別的產品
-    filteredProducts = products.filter(function(product) {
-      return product.category === categoryFilter;   // 檢查每個產品類別是否與所選類別相符
-    });
-  }
+  const filteredProducts = categoryFilter === 'all' 
+    ? products 
+    : products.filter(product => product.category === categoryFilter);
+
+  // 類別選項
+  const categoryOptions = [
+    { value: 'all', label: '所有類別' },
+    { value: 'food', label: '食品' },
+    { value: 'toy', label: '玩具' },
+    { value: 'accessories', label: '配件' }
+  ];
 
   return (
     <Container>
       <Heading>瀏覽全部商品</Heading>
       
       {/* 篩選器UI */}
-      <Card>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label>按類別篩選：</label>
-          <select 
+      <Card style={{ marginBottom: 20 }}>
+        <Space align="center">
+          <Text strong>按類別篩選：</Text>
+          <Select 
             value={categoryFilter} 
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            style={{
-              padding: '8px 12px',
-              border: '1px solid #660000',
-              borderRadius: '4px',
-              marginRight: '10px'
-            }}
+            onChange={setCategoryFilter}
+            style={{ width: 150 }}
           >
-            <option value="all">所有類別</option>
-            <option value="food">食品</option>
-            <option value="toy">玩具</option>
-            <option value="accessories">配件</option>
-          </select>
+            {categoryOptions.map(option => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
           
-          <span>顯示 {filteredProducts.length} 個產品</span>
-        </div>
+          <Divider type="vertical" />
+          
+          <Statistic 
+            title="顯示商品數量" 
+            value={filteredProducts.length} 
+            valueStyle={{ fontSize: '16px' }}
+          />
+        </Space>
       </Card>
       
       {/* 產品列表 */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', margin: '20px 0' }}>
+      <Row gutter={[16, 16]}>
         {filteredProducts.map(product => (
-          <Card 
-            key={product.id} 
-            style={{ 
-              flex: '1 1 calc(33.333% - 20px)', 
-              minWidth: '250px',
-              display: 'flex',
-              flexDirection: 'column',
-              height: '450px',  // 固定高度
-              justifyContent: 'space-between'  // 確保內容平均分布
-            }}
-          >
-            <img 
-              src={getProductImage(product.category, product.name) || '/placeholder.png'} 
-              alt={product.name}
-              style={{ 
-                width: '100%', 
-                height: '220px', 
-                objectFit: 'contain', 
-                borderRadius: '4px',
-                marginBottom: '12px',
-                backgroundColor: '#f9f9f9'
-              }}
-            />
-            <h3 style={{ marginBottom: '8px' }}>{product.name}</h3>
-            <p style={{ 
-              fontSize: '18px', 
-              fontWeight: 'bold', 
-              color: '#660000',
-              marginBottom: '15px' 
-            }}>${product.price}</p>
-            
-            {/* 按鈕 */}
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: 'row', 
-              gap: '10px',
-              marginTop: 'auto' 
-            }}>              
-              <Button 
-                primary
-                style={{ flex: 1, padding: '10px 0' }}
-                onClick={() => {
-                  // 顯示產品詳情模態框
-                  setSelectedProduct({
-                    ...product,
-                    imageSource: getProductImage(product.category, product.name) || '/placeholder.png'
-                  });
-                }}
+          <Col xs={24} sm={12} md={8} key={product.id}>
+            <Badge.Ribbon 
+              text={
+                product.category === 'food' ? '食品' :
+                product.category === 'toy' ? '玩具' : '配件'
+              } 
+              color={
+                product.category === 'food' ? 'green' :
+                product.category === 'toy' ? 'geekblue' : 'volcano'
+              }
+            >
+              <Card
+                hoverable
+                cover={
+                  <ProductImage 
+                    src={getProductImage(product.category, product.name) || '/placeholder.png'} 
+                    alt={product.name}
+                  />
+                }
+                actions={[
+                  <Button 
+                    type="text" 
+                    icon={<EyeOutlined />}
+                    onClick={() => {
+                      setSelectedProduct({
+                        ...product,
+                        imageSource: getProductImage(product.category, product.name) || '/placeholder.png'
+                      });
+                    }}
+                  >
+                    查看詳情
+                  </Button>,
+                  <Button 
+                    type="text" 
+                    icon={<ShoppingCartOutlined />}
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    加入購物車
+                  </Button>
+                ]}
               >
-                查看詳情
-              </Button>
-              <Button 
-                style={{ flex: 1, padding: '10px 0' }}
-                onClick={() => handleAddToCart(product)}
-              >
-                加入購物車
-              </Button>
-            </div>
-          </Card>
+                <Card.Meta
+                  title={<Title level={4}>{product.name}</Title>}
+                  description={
+                    <Statistic 
+                      value={product.price} 
+                      prefix="$"
+                      valueStyle={{ color: '#2B2118', fontSize: '18px' }}
+                    />
+                  }
+                />
+              </Card>
+            </Badge.Ribbon>
+          </Col>
         ))}
-      </div>
+      </Row>
       
       {/* 產品詳情模態框 */}
       {selectedProduct && (

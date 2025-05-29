@@ -1,5 +1,9 @@
 import React from 'react';
-import { Container, Card, Heading, Button } from '../styles/styles';
+import { Container, Heading } from '../styles/styles';
+import { Card, Button, Typography, Result } from 'antd';
+import { HomeOutlined } from '@ant-design/icons';
+
+const { Paragraph } = Typography;
 
 /**
  * @function NotFoundPage
@@ -10,16 +14,22 @@ function NotFoundPage() {
   return (
     <Container>
       <Card style={{ textAlign: 'center', padding: '40px 20px' }}>
-        <Heading>404 - 頁面未找到</Heading>
-        <p>很抱歉，您所尋找的頁面不存在。</p>
-        <p>可能是您輸入的網址有誤，或該頁面已被移除。</p>
-        <Button 
-          primary 
-          onClick={() => window.location.href = '/'}
-          style={{ marginTop: '20px' }}
+        <Result
+          status="404"
+          title="404 - 頁面未找到"
+          subTitle="很抱歉，您所尋找的頁面不存在。"
+          extra={
+            <Button 
+              type="primary" 
+              icon={<HomeOutlined />}
+              onClick={() => window.location.href = '/'}
+            >
+              返回首頁
+            </Button>
+          }
         >
-          返回首頁
-        </Button>
+          <Paragraph>可能是您輸入的網址有誤，或該頁面已被移除。</Paragraph>
+        </Result>
       </Card>
     </Container>
   );

@@ -1,153 +1,17 @@
 import React from 'react';
-import styled from '@emotion/styled';
-import { Button } from '../styles/styles';
+import { 
+  Modal, 
+  Button, 
+  Descriptions, 
+  Typography, 
+  Image, 
+  Divider, 
+  Space,
+  Statistic 
+} from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 
-// 模態對話框背景
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-`;
-
-// 模態對話框容器
-const ModalContainer = styled.div`
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 0;
-  animation: scaleIn 0.2s ease-out;
-  
-  @keyframes scaleIn {
-    from {
-      transform: scale(0.95);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-`;
-
-// 模態對話框頭部
-const ModalHeader = styled.div`
-  padding: 16px 24px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-// 模態對話框標題
-const ModalTitle = styled.h2`
-  margin: 0;
-  font-size: 20px;
-  color: #333;
-`;
-
-// 關閉按鈕
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #999;
-  transition: color 0.2s;
-  
-  &:hover {
-    color: #666;
-  }
-`;
-
-// 模態對話框內容
-const ModalContent = styled.div`
-  padding: 24px;
-`;
-
-// 產品圖片容器
-const ProductImageContainer = styled.div`
-  text-align: center;
-  margin-bottom: 20px;
-`;
-
-// 產品圖片
-const ProductImage = styled.img`
-  max-width: 100%;
-  max-height: 300px;
-  object-fit: contain;
-  border-radius: 4px;
-`;
-
-// 產品信息列表
-const ProductInfoList = styled.div`
-  margin-bottom: 20px;
-`;
-
-// 產品信息項
-const ProductInfoItem = styled.div`
-  display: flex;
-  margin-bottom: 12px;
-  
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-// 產品信息標籤
-const ProductInfoLabel = styled.div`
-  font-weight: 600;
-  width: 100px;
-  color: #666;
-`;
-
-// 產品信息值
-const ProductInfoValue = styled.div`
-  flex: 1;
-`;
-
-// 產品詳情
-const ProductDescription = styled.p`
-  margin-top: 20px;
-  line-height: 1.6;
-  color: #444;
-`;
-
-// 產品描述區
-const DescriptionSection = styled.div`
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #eee;
-`;
-
-// 模態對話框底部
-const ModalFooter = styled.div`
-  padding: 16px 24px;
-  border-top: 1px solid #eee;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-`;
+const { Title, Paragraph } = Typography;
 
 /**
  * @function ProductDetailModal
@@ -185,87 +49,59 @@ function ProductDetailModal({ product, onClose, onAddToCart }) {
     '貓砂盆': '尺寸: 45x35x40cm'
   };
   
-  // 禁止背景滾動
-  React.useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, []);
-  
-  // 處理點擊背景關閉
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-  
   return (
-    <ModalOverlay onClick={handleOverlayClick}>
-      <ModalContainer>
-        <ModalHeader>
-          <ModalTitle>{product.name}</ModalTitle>
-          <CloseButton onClick={onClose}>×</CloseButton>
-        </ModalHeader>
+    <Modal
+      open={true}
+      title={product.name}
+      onCancel={onClose}
+      width={700}
+      footer={[
+        <Button key="back" onClick={onClose}>
+          關閉
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          icon={<ShoppingCartOutlined />}
+          onClick={() => onAddToCart(product)}
+        >
+          加入購物車
+        </Button>,
+      ]}
+      centered
+    >
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+          <Image
+            src={product.imageSource}
+            alt={product.name}
+            style={{ maxHeight: '300px', objectFit: 'contain' }}
+          />
+        </div>
         
-        <ModalContent>
-          <ProductImageContainer>
-            <ProductImage 
-              src={product.imageSource} 
-              alt={product.name} 
+        <Descriptions bordered column={1}>
+          <Descriptions.Item label="價格">
+            <Statistic
+              value={product.price}
+              prefix="$"
+              valueStyle={{ color: '#2B2118', fontWeight: 'bold' }}
             />
-          </ProductImageContainer>
-          
-          <ProductInfoList>
-            <ProductInfoItem>
-              <ProductInfoLabel>價格</ProductInfoLabel>
-              <ProductInfoValue style={{ color: '#660000', fontWeight: 'bold' }}>
-                ${product.price}
-              </ProductInfoValue>
-            </ProductInfoItem>
-            
-            <ProductInfoItem>
-              <ProductInfoLabel>類別</ProductInfoLabel>
-              <ProductInfoValue>
-                {categoryNames[product.category] || product.category}
-              </ProductInfoValue>
-            </ProductInfoItem>
-            
-            <ProductInfoItem>
-              <ProductInfoLabel>規格</ProductInfoLabel>
-              <ProductInfoValue>
-                {productSpecs[product.name] || '標準規格'}
-              </ProductInfoValue>
-            </ProductInfoItem>
-          </ProductInfoList>
-          
-          <DescriptionSection>
-            <h3>產品介紹</h3>
-            <ProductDescription>
-              {productDescriptions[product.name] || 
-                '這是一個優質的寵物產品，專為您的毛小孩設計，保證品質與安全性。'}
-            </ProductDescription>
-          </DescriptionSection>
-        </ModalContent>
+          </Descriptions.Item>
+          <Descriptions.Item label="類別">
+            {categoryNames[product.category] || product.category}
+          </Descriptions.Item>
+          <Descriptions.Item label="規格">
+            {productSpecs[product.name] || '標準規格'}
+          </Descriptions.Item>
+        </Descriptions>
         
-        <ModalFooter>
-          <Button 
-            onClick={onClose}
-          >
-            關閉
-          </Button>
-          <Button 
-            primary
-            onClick={() => {
-              onAddToCart(product);
-              onClose();
-            }}
-          >
-            加入購物車
-          </Button>
-        </ModalFooter>
-      </ModalContainer>
-    </ModalOverlay>
+        <Divider orientation="left">產品介紹</Divider>
+        <Paragraph>
+          {productDescriptions[product.name] || 
+            '這是一個優質的寵物產品，專為您的毛小孩設計，保證品質與安全性。'}
+        </Paragraph>
+      </Space>
+    </Modal>
   );
 }
 

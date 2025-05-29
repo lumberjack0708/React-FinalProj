@@ -5,6 +5,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 // 匯入全域 CSS 樣式
 import './index.css';
+// 匯入 Ant Design 全域樣式
+// 注意：Ant Design v5 不再需要顯式導入 CSS 文件
+// import 'antd/dist/reset.css';
 // 匯入應用程式的根元件
 import App from './App';
 // 匯入用於測量應用程式性能的函式 (可選)
@@ -13,6 +16,9 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
+// 匯入 Ant Design 元件和自定義主題配置
+import { ConfigProvider } from 'antd';
+import { themeConfig } from './styles/styles';
 
 // 建立 React 應用程式的根節點
 // ReactDOM.createRoot 是 React 18+ 的推薦 API，用於啟用並行功能
@@ -24,9 +30,11 @@ root.render(
   // 它不會渲染任何可見的 UI，只對其後代元素啟用額外的檢查和警告 (僅在開發模式下)。
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ConfigProvider theme={themeConfig}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ConfigProvider>
     </Provider>
   </React.StrictMode>
 );

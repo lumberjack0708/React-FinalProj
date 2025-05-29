@@ -13,8 +13,13 @@ import {
 } from '../store/cartSlice';
 // 匯入自定義的 useNotification Hook，用於顯示通知
 import { useNotification } from '../components/Notification';
-// 匯入樣式化元件，如容器、卡片、標題和按鈕
-import { Container, Card, Heading, Button } from '../styles/styles';
+// 匯入 Ant Design 元件
+import { Card, Button, Typography, Space, Row, Col, Statistic, Divider, Empty } from 'antd';
+import { ShoppingOutlined, MinusOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+// 匯入保留的 Emotion 樣式元件
+import { Container, Heading } from '../styles/styles';
+
+const { Title, Text } = Typography;
 
 /**
  * @function CartPage
@@ -101,60 +106,75 @@ function CartPage() {
       // 如果購物車為空，顯示提示訊息和繼續購物的按鈕
       ) : cartItems.length === 0 ? (
         <Card>
-          <p>購物車是空的</p>
-          <Button primary onClick={() => navigate('/products')}>繼續購物</Button>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="購物車是空的"
+          >
+            <Button 
+              type="primary" 
+              icon={<ShoppingOutlined />}
+              onClick={() => navigate('/products')}
+            >
+              繼續購物
+            </Button>
+          </Empty>
         </Card>
       // 如果購物車中有商品，則顯示商品列表和訂單摘要
       ) : (
-        <>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {/* 遍歷購物車中的商品並為每個商品渲染一個卡片 */}
           {cartItems.map(item => (
-            <Card key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h3>{item.name}</h3>
-                <p>單價: ${item.price}</p>
-              </div>
-              {/* 商品數量控制和移除按鈕 */}
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {/* 減少數量按鈕 */}
-                <Button 
-                  onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                  style={{ margin: '0 8px' }}
-                >
-                  -
-                </Button>
-                {/* 顯示目前商品數量 */}
-                <span>{item.quantity}</span>
-                {/* 增加數量按鈕 */}
-                <Button 
-                  onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                  style={{ margin: '0 8px' }}
-                >
-                  +
-                </Button>
-                {/* 移除商品按鈕 */}
-                <Button 
-                  onClick={() => handleRemoveItem(item.id)}
-                  style={{ marginLeft: '16px' }}
-                >
-                  移除
-                </Button>
-              </div>
+            <Card key={item.id}>
+              <Row align="middle" justify="space-between">
+                <Col span={12}>
+                  <Title level={4}>{item.name}</Title>
+                  <Text>單價: ${item.price}</Text>
+                </Col>
+                <Col span={12} style={{ textAlign: 'right' }}>
+                  <Space>
+                    <Button 
+                      icon={<MinusOutlined />}
+                      onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                    />
+                    <Text strong style={{ margin: '0 8px' }}>{item.quantity}</Text>
+                    <Button 
+                      icon={<PlusOutlined />}
+                      onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                    />
+                    <Button 
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleRemoveItem(item.id)}
+                    >
+                      移除
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
             </Card>
           ))}
+          
           {/* 訂單摘要卡片 */}
           <Card>
-            <h3>訂單摘要</h3>
-            <p>總金額: ${totalPrice}</p>
-            {/* 結帳按鈕 */}
+            <Title level={3}>訂單摘要</Title>
+            <Divider />
+            <Statistic
+              title="總金額"
+              value={totalPrice}
+              precision={0}
+              prefix="$"
+            />
+            <Divider />
             <Button 
-              primary
+              type="primary" 
+              size="large"
+              block
               onClick={handleCheckout}
             >
               結帳
             </Button>
           </Card>
-        </>
+        </Space>
       )}
     </Container>
   );
