@@ -7,8 +7,6 @@ import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import CartPage from './pages/CartPage';
 import NotFoundPage from './pages/NotFoundPage';
-// 匯入共用元件
-import Footer from './components/Footer';
 // 匯入通知相關的 Provider
 import { NotificationProvider } from './components/Notification';
 // 匯入 Ant Design 元件
@@ -20,7 +18,7 @@ import { selectCartItemCount } from './store/cartSlice';
 // 匯入 normalize.css 標準化瀏覽器樣式
 import 'normalize.css'; 
 
-const { Header, Content, Footer: AntFooter } = Layout;
+const { Header, Content } = Layout;
 
 /**
  * @function AppContent
@@ -117,9 +115,6 @@ function AppContent() {
           </Routes>
         </div>
       </Content>
-      <AntFooter style={{ textAlign: 'center', background: token.colorBgContainer, marginTop: '16px' }}>
-        <Footer />
-      </AntFooter>
     </Layout>
   );
 }

@@ -16,11 +16,17 @@ import {
   Space, 
   Statistic, 
   Badge,
-  Divider
+  Divider,
+  Radio,
+  Tooltip
 } from 'antd';
 import { 
   ShoppingCartOutlined, 
-  EyeOutlined 
+  EyeOutlined,
+  FilterOutlined,
+  SortAscendingOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined
 } from '@ant-design/icons';
 // 引入保留的 Emotion 樣式組件
 import {
@@ -56,6 +62,7 @@ function ProductsPage() {
   
   // 篩選狀態
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('default');
   
   // 產品詳情模態框狀態
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -70,9 +77,16 @@ function ProductsPage() {
   };
   
   // 篩選產品
-  const filteredProducts = categoryFilter === 'all' 
-    ? products 
-    : products.filter(product => product.category === categoryFilter);
+  let filteredProducts = categoryFilter === 'all' 
+    ? [...products] 
+    : [...products].filter(product => product.category === categoryFilter);
+
+  // 排序產品
+  if (sortOrder === 'price-asc') {
+    filteredProducts.sort((a, b) => a.price - b.price);
+  } else if (sortOrder === 'price-desc') {
+    filteredProducts.sort((a, b) => b.price - a.price);
+  }
 
   // 類別選項
   const categoryOptions = [
@@ -88,28 +102,61 @@ function ProductsPage() {
       
       {/* 篩選器UI */}
       <Card style={{ marginBottom: 20 }}>
-        <Space align="center">
-          <Text strong>按類別篩選：</Text>
-          <Select 
-            value={categoryFilter} 
-            onChange={setCategoryFilter}
-            style={{ width: 150 }}
-          >
-            {categoryOptions.map(option => (
-              <Option key={option.value} value={option.value}>
-                {option.label}
-              </Option>
-            ))}
-          </Select>
+        <Row gutter={[16, 16]} align="middle">
+          <Col xs={24} lg={9}>
+            <Space align="center">
+              <FilterOutlined style={{ fontSize: '16px', color: '#2B2118' }} />
+              <Text strong>按類別篩選：</Text>
+              <Select 
+                value={categoryFilter} 
+                onChange={setCategoryFilter}
+                style={{ width: 150 }}
+              >
+                {categoryOptions.map(option => (
+                  <Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+            </Space>
+          </Col>
           
-          <Divider type="vertical" />
+          <Col xs={24} lg={10}>
+            <Space size="middle" style={{ display: 'flex', flexWrap: 'nowrap' }}>
+              <SortAscendingOutlined style={{ fontSize: '16px', color: '#2B2118' }} />
+              <Text strong>排序：</Text>
+              <Radio.Group 
+                value={sortOrder} 
+                onChange={e => setSortOrder(e.target.value)}
+                optionType="button"
+                buttonStyle="solid"
+                size="middle"
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                <Radio.Button value="default">預設</Radio.Button>
+                <Radio.Button value="price-asc">價格↑</Radio.Button>
+                <Radio.Button value="price-desc">價格↓</Radio.Button>
+              </Radio.Group>
+            </Space>
+          </Col>
           
-          <Statistic 
-            title="顯示商品數量" 
-            value={filteredProducts.length} 
-            valueStyle={{ fontSize: '16px' }}
-          />
-        </Space>
+          <Col xs={24} lg={5} style={{ textAlign: 'right' }}>
+            <Tooltip title="商品總數">
+              <Statistic 
+                title={
+                  <Space>
+                    <AppstoreOutlined style={{ fontSize: '16px', color: '#2B2118' }} />
+                    <Text strong>商品數量</Text>
+                  </Space>
+                }
+                value={filteredProducts.length} 
+                valueStyle={{ fontSize: '18px', color: '#2B2118', fontWeight: 'bold' }}
+                prefix={<UnorderedListOutlined />}
+                suffix="件"
+              />
+            </Tooltip>
+          </Col>
+        </Row>
       </Card>
       
       {/* 產品列表 */}
