@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../store/cartSlice';
@@ -67,6 +67,31 @@ function ProductsPage() {
   // 產品詳情模態框狀態
   const [selectedProduct, setSelectedProduct] = useState(null);
   
+  // 處理頁面滾動時固定排序按鈕的問題
+  useEffect(() => {
+    const handleScroll = () => {
+      // 當頁面滾動時，強制更新按鈕組的狀態
+      const radioButtons = document.querySelectorAll('.ant-radio-button-wrapper-checked');
+      radioButtons.forEach(button => {
+        // 移除並重新添加選中狀態，確保按鈕不會保持選中狀態
+        if (button.classList.contains('ant-radio-button-wrapper-checked')) {
+          button.classList.remove('ant-radio-button-wrapper-checked');
+          setTimeout(() => {
+            button.classList.add('ant-radio-button-wrapper-checked');
+          }, 0);
+        }
+      });
+    };
+
+    // 添加滾動事件監聽器
+    window.addEventListener('scroll', handleScroll);
+    
+    // 清理函數，組件卸載時移除事件監聽器
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  
   // 添加商品到購物車的處理函數
   const handleAddToCart = (product) => {
     dispatch(addToCart(product));
@@ -74,6 +99,23 @@ function ProductsPage() {
       '已加入購物車', 
       `${product.name} 已成功加入您的購物車！`
     );
+  };
+  
+  // 處理排序改變
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+    // 延遲處理以確保 DOM 已更新
+    setTimeout(() => {
+      // 修復選中狀態顯示問題
+      const checkedButton = document.querySelector(`.ant-radio-button-wrapper[data-value="${e.target.value}"]`);
+      if (checkedButton) {
+        const allButtons = document.querySelectorAll('.ant-radio-button-wrapper');
+        allButtons.forEach(btn => {
+          btn.classList.remove('ant-radio-button-wrapper-checked');
+        });
+        checkedButton.classList.add('ant-radio-button-wrapper-checked');
+      }
+    }, 0);
   };
   
   // 篩選產品
@@ -127,15 +169,17 @@ function ProductsPage() {
               <Text strong>排序：</Text>
               <Radio.Group 
                 value={sortOrder} 
-                onChange={e => setSortOrder(e.target.value)}
+                onChange={handleSortChange}
                 optionType="button"
                 buttonStyle="solid"
                 size="middle"
                 style={{ whiteSpace: 'nowrap' }}
+                className="sort-radio-group"
+                destroyInactiveOptions={true}
               >
-                <Radio.Button value="default">預設</Radio.Button>
-                <Radio.Button value="price-asc">價格↑</Radio.Button>
-                <Radio.Button value="price-desc">價格↓</Radio.Button>
+                <Radio.Button value="default" className="sort-radio-button" data-value="default">預設</Radio.Button>
+                <Radio.Button value="price-asc" className="sort-radio-button" data-value="price-asc">價格↑</Radio.Button>
+                <Radio.Button value="price-desc" className="sort-radio-button" data-value="price-desc">價格↓</Radio.Button>
               </Radio.Group>
             </Space>
           </Col>
